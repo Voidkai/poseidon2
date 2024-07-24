@@ -2,7 +2,9 @@
 
 package poseidon2
 
-import "github.com/iden3/go-iden3-crypto/ff"
+import (
+	"github.com/iden3/go-iden3-crypto/ff"
+)
 
 type Poseidon2 struct {
 	RoundConstants [][]ff.Element
@@ -44,33 +46,41 @@ func (p *Poseidon2) Permutation(input []*ff.Element) []*ff.Element {
 func (p *Poseidon2) Sbox(input []*ff.Element) []*ff.Element {
 	output := make([]*ff.Element, len(input))
 	for i, el := range input {
+		output[i] = new(ff.Element)
 		output[i] = p.SboxP(el)
 	}
 	return output
 }
 
 func (p *Poseidon2) SboxP(input *ff.Element) *ff.Element {
-	input2 := input
-	input2.Square(input2)
-	out := input2
-	out.Square(out)
+	input2 := new(ff.Element)
+	input2.Square(input)
+	out := new(ff.Element)
+	out.Square(input2)
 	out.Mul(out, input)
 	return out
 }
 
+// MatmulExternal is a matrix multiplication with the external matrix
+// [2, 1, 1]
+// [1, 2, 1]
+// [1, 1, 2]
 func (p *Poseidon2) MatmulExternal(input []*ff.Element) {
-
-	sum := input[0]
-	sum.Add(sum, input[1])
+	sum := new(ff.Element)
+	sum.Add(input[0], input[1])
 	sum.Add(sum, input[2])
 	input[0].Add(input[0], sum)
 	input[1].Add(input[1], sum)
 	input[2].Add(input[2], sum)
 }
 
+// MatmulInternal is a matrix multiplication with the internal matrix
+// [2, 1, 1]
+// [1, 2, 1]
+// [1, 1, 3]
 func (p *Poseidon2) MatmulInternal(input []*ff.Element) {
-	sum := input[0]
-	sum.Add(sum, input[1])
+	sum := new(ff.Element)
+	sum.Add(input[0], input[1])
 	sum.Add(sum, input[2])
 	input[0].Add(input[0], sum)
 	input[1].Add(input[1], sum)
@@ -81,8 +91,8 @@ func (p *Poseidon2) MatmulInternal(input []*ff.Element) {
 func (p *Poseidon2) AddRc(input []*ff.Element, rc []ff.Element) []*ff.Element {
 	output := make([]*ff.Element, len(input))
 	for i := range input {
-		output[i] = input[i]
-		output[i].Add(output[i], &rc[i])
+		output[i] = new(ff.Element)
+		output[i].Add(input[i], &rc[i])
 	}
 	return output
 }

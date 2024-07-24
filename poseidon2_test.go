@@ -33,6 +33,18 @@ func TestPoseidonHashFixed(t *testing.T) {
 		h[2])
 }
 
+func TestSbox(t *testing.T) {
+	poseidon2 := NewPoseidon2(RoundConstants)
+	b := ff.NewElement().SetBigInt(big.NewInt(2))
+	assert.Equal(t,
+		"2",
+		b.String())
+	b = poseidon2.SboxP(b)
+	assert.Equal(t,
+		"32",
+		b.String())
+}
+
 func BenchmarkPoseidon2Hash(b *testing.B) {
 	b0 := ff.NewElement().SetBigInt(big.NewInt(0))
 	b1 := ff.NewElement().SetBigInt(utils.NewIntFromString("12242166908188651009877250812424843524687801523336557272219921456462821518061")) //nolint:lll
